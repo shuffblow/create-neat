@@ -1,13 +1,15 @@
 import fs from "fs";
 import path from "path";
 
-const Protocols = require("../configs/protocol");
 import { Preset } from "../utils/preset";
 
 import Generator from "./Generator";
 import PluginToTemplateAPI from "./protocolGenerator/PluginToTemplateAPI";
 import TemplateToBuildToolAPI from "./protocolGenerator/TemplateToBuildToolAPI";
 import FileTree from "./FileTree";
+import PluginToBuildToolAPI from "./protocolGenerator/PluginToBuildToolAPI";
+
+const Protocols = require("../configs/protocol");
 
 const { pluginToTemplateProtocol, pluginToBuildToolProtocol, templateToBuildToolProtocol } =
   Protocols;
@@ -16,7 +18,7 @@ interface ConfigFileData {
   file: Record<string, string[]>;
 }
 
-type ProtocolAPI = PluginToTemplateAPI | TemplateToBuildToolAPI /* | PluginToBuildToolAPI */;
+type ProtocolAPI = PluginToTemplateAPI | TemplateToBuildToolAPI | PluginToBuildToolAPI;
 
 /**
  * 传入协议的参数，不再对每个协议单独传参，而是统一挂载在API上
@@ -64,7 +66,7 @@ class BaseAPI {
       if (protocol in pluginToTemplateProtocol) {
         api = new PluginToTemplateAPI(protocols, props, protocol);
       } else if (protocol in pluginToBuildToolProtocol) {
-        // api = new PluginToBuildToolAPI(protocols);
+        api = new PluginToBuildToolAPI(protocols, props, protocol);
       } else if (protocol in templateToBuildToolProtocol) {
         api = new TemplateToBuildToolAPI(protocols, props, protocol);
       }

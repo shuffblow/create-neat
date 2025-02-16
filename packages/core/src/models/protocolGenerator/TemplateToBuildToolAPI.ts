@@ -56,9 +56,16 @@ class TemplateToBuildToolAPI extends ProtocolGeneratorAPI {
           path.resolve(__dirname, relativePathToRoot),
         );
         // 处理构建工具配置
-        if (typeof baseEntry === "function") {
+        const baseFunc = baseEntry[Object.keys(baseEntry)[0]];
+        if (typeof baseFunc === "function") {
           // 解析配置项成 ast 语法树,并且和原始配置的 ast 合并
-          createConfigByParseAst(buildTool, baseEntry(buildTool, template), buildToolConfigAst);
+          // 此处临时只判断了swc和babel的逻辑，其他插件的配置格式不太对，待之后完善
+          if (
+            Object.keys(baseEntry)[0] === "pluginSwc" ||
+            Object.keys(baseEntry)[0] === "pluginBabel"
+          ) {
+            createConfigByParseAst(buildTool, baseFunc(buildTool, template), buildToolConfigAst);
+          }
         }
       }
     }

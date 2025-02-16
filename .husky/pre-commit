@@ -2,6 +2,10 @@ sh scripts/check-git-config.sh
 
 echo 'running pre-commit checks ...'
 
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# nvm use 18|| exit 1
+# pnpm run lint-staged
 # 运行 lint-staged
 npx lint-staged -q
 
