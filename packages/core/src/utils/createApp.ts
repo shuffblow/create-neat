@@ -1,4 +1,3 @@
-const { resolveApp } = require("@laconic/utils");
 import fs from "fs-extra";
 import { exec } from "child_process";
 import { confirm } from "@clack/prompts";
@@ -17,6 +16,8 @@ import createSuccessInfo from "./createSuccessInfo";
 import dependenciesInstall from "./dependenciesInstall";
 import { createReadmeString } from "./createFiles";
 import { buildToolConfigDevDependencies, buildToolScripts } from "./constants";
+
+const { resolveApp } = require("@laconic/utils");
 
 /**
  * 将输入模式设置为原始模式。

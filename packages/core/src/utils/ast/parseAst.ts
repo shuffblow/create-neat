@@ -63,6 +63,10 @@ export const createConfigByParseAst = (buildTool: buildToolType, options: Option
   }
 };
 
+/**
+ * 创建动态路径解析调用
+ * @param args 路径参数
+ */
 function createPathResolveCall(args: string[]) {
   return callExpression(memberExpression(identifier("path"), identifier("resolve")), [
     identifier("__dirname"),
@@ -107,6 +111,7 @@ function mergeWebpackConfigAst(options: Options, ast) {
             let ruleAstNode;
             // 如果include属性为数组
             if (Array.isArray(rule.include)) {
+              // 处理include的处理逻辑，能够支持动态路径解析
               parseIncludeAst = arrayExpression(
                 rule.include.map((item) => {
                   if (typeof item === "object" && item.__astType === "pathResolve") {
