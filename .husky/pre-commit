@@ -2,10 +2,6 @@ sh scripts/check-git-config.sh
 
 echo 'running pre-commit checks ...'
 
-# 加载nvm脚本，使用node18
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-# nvm use 18|| exit 1
 # 运行 lint-staged
 npx lint-staged -q
 
