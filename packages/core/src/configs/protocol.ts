@@ -14,6 +14,7 @@ const pluginToTemplateProtocol = {
 // 插件对构建工具的协议
 const pluginToBuildToolProtocol = {
   ...globalProtocol,
+  ADD_COMPILER_CONFIG: "ADD_COMPILER_CONFIG", // 处理编译器类协议，如：babel, swc。
 };
 
 // 框架对构建工具的协议

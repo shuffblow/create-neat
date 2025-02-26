@@ -1,3 +1,8 @@
+// const path = require("path");
+// import pluginToBuildToolProtocol from "../../../core/src/configs/protocol.ts";
+const protocol = require("../../../core/src/configs/protocol.ts");
+const pluginToBuildToolProtocol = protocol.pluginToBuildToolProtocol;
+
 // 通用的Babel预设和插件
 const commonBabelPresets = [
   [
@@ -42,8 +47,61 @@ const vueBabelConfig = {
   plugins: ["@vue/babel-plugin-jsx", ...commonBabelPlugins],
 };
 
-module.exports = (generatorAPI, template) => {
+// 构建工具配置生成器映射
+const buildToolConfigGenerators = {
+  webpack: ({ test, template }) => {
+    const baseRule = {
+      test,
+      include: [
+        {
+          __astType: "pathResolve",
+          args: ["./src"],
+        },
+      ],
+      exclude: [/node_modules/, /public/, /(.|_)min\.js$/],
+      use: [{ loader: "babel-loader" }],
+    };
+
+    return {
+      module: {
+        rules: [baseRule],
+      },
+    };
+  },
+  vite: ({ babelConfig, template }) => ({
+    __astType: "viteConfig",
+    value: {
+      plugins: [
+        {
+          name: "vite-plugin-babel",
+          transform: (code, id) => {
+            if (id.match(/\.(jsx?|tsx?)$/)) {
+              return require("@babel/core").transformSync(code, {
+                ...babelConfig,
+                filename: id,
+              }).code;
+            }
+          },
+        },
+      ],
+      optimizeDeps: {
+        include: template === "react" ? ["react", "react-dom"] : ["vue"],
+      },
+    },
+  }),
+  rollup: ({ babelConfig }) => ({
+    plugins: [
+      require("@rollup/plugin-babel")({
+        ...babelConfig,
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      }),
+    ],
+  }),
+};
+
+module.exports = (generatorAPI, template, buildTool) => {
   let config;
+  let test;
   if (template === "react") {
     config = {
       babel: reactBabelConfig,
@@ -53,6 +111,7 @@ module.exports = (generatorAPI, template) => {
         "@babel/preset-react": "^7.24.7",
       },
     };
+    test = /\.(ts|tsx|js|jsx)$/;
   } else if (template === "vue") {
     config = {
       babel: vueBabelConfig,
@@ -64,9 +123,32 @@ module.exports = (generatorAPI, template) => {
         "@ant-design-vue/vue-jsx-hot-loader": "^0.1.4",
       },
     };
+    test = /\.(ts|js)$/;
   }
+
+  // 获取构建工具配置生成器
+  const configGenerator = buildToolConfigGenerators[buildTool];
+  if (!configGenerator) {
+    throw new Error(`不支持的构建工具: ${buildTool}`);
+  }
+
+  // 生成构建工具特定配置
+  const buildToolConfig = configGenerator({
+    test,
+    template,
+    babelConfig: config.babel,
+  });
+
   // 扩展package.json配置
   generatorAPI.extendPackage({
     ...config,
+  });
+
+  generatorAPI.protocolGenerate({
+    [pluginToBuildToolProtocol.ADD_COMPILER_CONFIG]: {
+      params: {
+        config: buildToolConfig,
+      },
+    },
   });
 };
