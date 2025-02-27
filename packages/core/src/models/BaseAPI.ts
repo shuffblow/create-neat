@@ -70,7 +70,6 @@ class BaseAPI {
       } else if (protocol in templateToBuildToolProtocol) {
         api = new TemplateToBuildToolAPI(protocols, props, protocol);
       }
-      console.log(pluginToBuildToolProtocol, protocol);
       api.generator();
     }
   }

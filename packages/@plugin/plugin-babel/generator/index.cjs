@@ -49,7 +49,7 @@ const vueBabelConfig = {
 
 // 构建工具配置生成器映射
 const buildToolConfigGenerators = {
-  webpack: ({ test, template }) => {
+  webpack: ({ test }) => {
     const baseRule = {
       test,
       include: [
@@ -63,31 +63,24 @@ const buildToolConfigGenerators = {
     };
 
     return {
-      module: {
-        rules: [baseRule],
-      },
+      rules: [baseRule],
+      plugins: [],
     };
   },
-  vite: ({ babelConfig, template }) => ({
-    __astType: "viteConfig",
-    value: {
-      plugins: [
-        {
-          name: "vite-plugin-babel",
-          transform: (code, id) => {
-            if (id.match(/\.(jsx?|tsx?)$/)) {
-              return require("@babel/core").transformSync(code, {
-                ...babelConfig,
-                filename: id,
-              }).code;
-            }
-          },
+  vite: ({ babelConfig }) => ({
+    plugins: [
+      {
+        name: "vite-plugin-babel",
+        transform: (code, id) => {
+          if (id.match(/\.(jsx?|tsx?)$/)) {
+            return require("@babel/core").transformSync(code, {
+              ...babelConfig,
+              filename: id,
+            }).code;
+          }
         },
-      ],
-      optimizeDeps: {
-        include: template === "react" ? ["react", "react-dom"] : ["vue"],
       },
-    },
+    ],
   }),
   rollup: ({ babelConfig }) => ({
     plugins: [
@@ -146,9 +139,8 @@ module.exports = (generatorAPI, template, buildTool) => {
 
   generatorAPI.protocolGenerate({
     [pluginToBuildToolProtocol.ADD_COMPILER_CONFIG]: {
-      params: {
-        config: buildToolConfig,
-      },
+      config: buildToolConfig,
+      buildTool,
     },
   });
 };
