@@ -3,19 +3,20 @@ import { exec } from "child_process";
 import { confirm } from "@clack/prompts";
 import chalk from "chalk";
 import path from "path";
+import { resolveApp } from "@laconic/utils";
 
-import Generator from "../models/Generator";
-import PackageAPI from "../models/PackageAPI";
+import Generator from "../models/Generator.js";
+import PackageAPI from "../models/PackageAPI.js";
 
-import { removeDirectory, readTemplateFileContent } from "./fileController";
-import { projectSelect } from "./select";
-import gitCheck from "./gitCheck";
-import { createFiles } from "./createFiles";
-import { type Preset } from "./preset";
-import createSuccessInfo from "./createSuccessInfo";
-import dependenciesInstall from "./dependenciesInstall";
-import { createReadmeString } from "./createFiles";
-import { buildToolConfigDevDependencies, buildToolScripts } from "./constants";
+import { readTemplateFileContent } from "./fileController.js";
+import { projectSelect } from "./select.js";
+import gitCheck from "./gitCheck.js";
+import { createFiles } from "./createFiles.js";
+import { type Preset } from "./preset.js";
+import createSuccessInfo from "./createSuccessInfo.js";
+import dependenciesInstall from "./dependenciesInstall.js";
+import { createReadmeString } from "./createFiles.js";
+import { buildToolConfigDevDependencies, buildToolScripts } from "./constants.js";
 
 const { resolveApp } = require("@laconic/utils");
 
@@ -84,9 +85,7 @@ async function checkFolder(rootDirectory: string, options: Record<string, any>) 
  */
 function createFolder(rootDirectory: string) {
   // 如果存在目标目录则删除
-  if (fs.existsSync(rootDirectory)) {
-    removeDirectory(rootDirectory, false); // 删除已存在的目录
-  }
+  fs.emptyDirSync(rootDirectory);
 
   // 创建目录
   fs.mkdirSync(rootDirectory, { recursive: true });
@@ -102,6 +101,7 @@ function createFolder(rootDirectory: string) {
 export default async function createAppTest(projectName: string, options: Record<string, any>) {
   // 记录开发环境并设置环境变量
   process.env.NODE_ENV = options.dev ? "DEV" : "PROD";
+  process.env.PROJECT_NAME = projectName;
 
   // 获取到项目的根目录的绝对路径
   const rootDirectory = resolveApp(projectName);

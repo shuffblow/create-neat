@@ -9,14 +9,14 @@ import {
   identifier,
 } from "@babel/types";
 
-import { buildToolType } from "../../types";
+import { buildToolType } from "../../types/index.js";
 
 import {
   createImportDeclaration,
   createNewExpression,
   createCallExpression,
   createObjectProperty,
-} from "./commonAst";
+} from "./commonAst.js";
 
 enum BuildToolType {
   VITE = "vite",
