@@ -10,8 +10,6 @@ import { CLIENT_OS } from "./constants.js";
 const { readFileSync } = fs;
 const __dirname = import.meta.dirname;
 
-const { resolveApp } = require("@laconic/utils");
-
 /**
  * @author moment
  * @param directoryPath 删除文件的路径，默认 node_modules

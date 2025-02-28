@@ -18,8 +18,6 @@ import dependenciesInstall from "./dependenciesInstall.js";
 import { createReadmeString } from "./createFiles.js";
 import { buildToolConfigDevDependencies, buildToolScripts } from "./constants.js";
 
-const { resolveApp } = require("@laconic/utils");
-
 /**
  * 将输入模式设置为原始模式。
  */

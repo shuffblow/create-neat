@@ -1,7 +1,5 @@
 import prettier from "prettier";
-
-// import prettierPluginVue from "prettier-plugin-vue";
-// const prettierPluginVue = require("prettier-plugin-vue");
+import prettierPluginVue from "prettier-plugin-vue";
 
 const needFormat = ["ts", "tsx", "js", "jsx", "vue"];
 
@@ -18,7 +16,7 @@ const formatCode = async (code: string, extension: string) => {
   const result = code.replace(/\/\*\s*slot:\s*\w+(?:-\w+)*\s*\*\//g, "");
   const formatted = await prettier.format(result, {
     parser: extension === "vue" ? "vue" : "babel",
-    // plugins: [prettierPluginVue], // 引入 Vue 插件
+    plugins: [prettierPluginVue], // 引入 Vue 插件
   });
   return formatted;
 };
