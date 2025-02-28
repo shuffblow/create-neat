@@ -1,6 +1,6 @@
-import { createConfigByParseAst } from "../../utils/ast/parseAst";
+import { createConfigByParseAst } from "../../utils/ast/parseAst.js";
 
-import ProtocolGeneratorAPI from "./ProtocolGeneratorAPI";
+import ProtocolGeneratorAPI from "./ProtocolGeneratorAPI.js";
 
 /**
  * 插件对构建工具协议
