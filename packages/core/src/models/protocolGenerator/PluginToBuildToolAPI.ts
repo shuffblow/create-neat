@@ -19,14 +19,70 @@ class PluginToBuildToolAPI extends ProtocolGeneratorAPI {
   /**
    * 编译器类插件协议
    * @param params
-   * @param params.config 配置
+   * @param params.compiler 编译器
+   * @param params.template 模板
    * @param params.buildTool 构建工具选择
    */
   ADD_COMPILER_CONFIG(params) {
-    const { config, buildTool } = params;
-    console.log("协议里面", config, buildTool);
+    const { compiler, template, buildTool } = params;
     const buildToolConfigAst = this.props.buildToolConfigAst;
-    createConfigByParseAst(buildTool, config, buildToolConfigAst);
+    // 默认生成的单独配置文件
+    const compilerConfigMap = {
+      babel: "./babel.config.js",
+      swc: "./.swcrc",
+    };
+    // 抽离出来的构建工具配置文件，需要传入 匹配文件格式test，和编译器compiler
+    const buildToolConfigGenerators = {
+      webpack: ({ test, compiler }) => {
+        const baseRule = {
+          test,
+          include: [
+            {
+              __astType: "pathResolve",
+              args: ["./src"],
+            },
+          ],
+          exclude: [/node_modules/, /public/, /(.|_)min\.js$/],
+          use: [{ loader: `${compiler}-loader` }],
+        };
+
+        return {
+          rules: [baseRule],
+          plugins: [],
+        };
+      },
+      vite: ({ test, compiler }) => ({
+        plugins: [
+          {
+            name: `vite-plugin-${compiler}`,
+            transform: (code, id) => {
+              if (id.match(test)) {
+                return require(`@${compiler}/core`).transformSync(code, {
+                  configFile: compilerConfigMap[compiler],
+                  filename: id,
+                }).code;
+              }
+            },
+          },
+        ],
+      }),
+      rollup: ({ compiler }) => ({
+        plugins: [require(`@rollup/plugin-${compiler}`)],
+      }),
+    };
+
+    let test;
+    if (template === "react") {
+      test = /\.(ts|tsx|js|jsx)$/;
+    } else if (template === "vue") {
+      test = /\.(ts|js)$/;
+    }
+
+    const buildToolConfig = buildToolConfigGenerators[buildTool]({ test, compiler });
+    if (!buildToolConfig) {
+      throw new Error(`不支持的构建工具: ${buildTool}`);
+    }
+    createConfigByParseAst(buildTool, buildToolConfig, buildToolConfigAst);
   }
 }
 
