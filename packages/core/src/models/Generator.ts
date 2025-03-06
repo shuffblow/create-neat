@@ -163,7 +163,7 @@ class Generator {
   }
 
   // 根据环境变量加载 plugin/template
-  // 返回增加可选的buildTool，编译器🥱插件(babel/swc)需要
+  // 返回增加可选的buildTool，编译器插件(babel/swc)需要
   async loadBase(
     pkgPath: string,
     modulePath: string,
